@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reproductor de Canciones de Luis Miguel</title>
+<style>
+  .botonera {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+  .boton {
+    padding: 10px 20px;
+    margin: 0 10px;
+    cursor: pointer;
+  }
+  #letra {
+    white-space: pre-wrap;
+    font-family: Arial, sans-serif;
+    font-size: 18px;
+    line-height: 1.5;
+    color: #333;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+
+<div class="botonera">
+  <button class="boton" onclick="reproducirCancion('/especiales-multimedia/luis-miguel/audio/cancion-1.mp3', '/especiales-multimedia/luis-miguel/letras/letra-cancion-1.txt')">Boton 1</button>
+  <button class="boton" onclick="reproducirCancion('cancion2.mp3', 'letraCancion2.txt')">Boton 2</button>
+  <button class="boton" onclick="reproducirCancion('cancion3.mp3', 'letraCancion3.txt')">Boton 3</button>
+  <button class="boton" onclick="reproducirCancion('cancion4.mp3', 'letraCancion4.txt')">Boton 4</button>
+</div>
+
+<div id="letra"></div>
+
+<script>
+    function reproducirCancion(cancion, letra) {
+    var audio = new Audio(cancion);
+    audio.play();
+    
+    fetch(letra)
+        .then(response => response.text())
+        .then(text => {
+            var lines = text.split('\n');
+            var letraDiv = document.getElementById('letra');
+            var letraMostrada = '';
+
+            audio.addEventListener('timeupdate', function() {
+            var tiempoActual = audio.currentTime;
+            var letraActual = '';
+            for (var i = 0; i < lines.length; i++) {
+                var line = lines[i].split('|');
+                var tiempoLinea = parseTiempo(line[0]);
+                if (!isNaN(tiempoLinea) && tiempoLinea <= tiempoActual) {
+                letraActual += line[1] + '\n';
+                }
+            }
+            if (letraActual !== letraMostrada) {
+                letraDiv.innerText = letraMostrada = letraActual;
+            }
+            });
+        })
+        .catch(error => {
+            console.error('Error al cargar la letra:', error);
+        });
+    }
+
+    // Función para convertir el tiempo en formato 'mm:ss' a segundos
+    function parseTiempo(tiempo) {
+        var parts = tiempo.split(':');
+        var minutes = parseInt(parts[0]);
+        var seconds = parseInt(parts[1]);
+        return minutes * 60 + seconds;
+    }
+
+</script>
+
+</body>
+</html>

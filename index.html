@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Luis Miguel Info</title>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+</head>
+<body>
+
+    <h1>Información sobre Luis Miguel</h1>
+
+    <div id="artist-info"></div>
+
+    <script>
+        // Credenciales de la aplicación en el panel de desarrolladores de Spotify
+        const clientId = '62c16286b07c4206aa087ad55dc4b5c6';
+        const clientSecret = '704857905a51499692c564b8e6080314';
+
+        // Obtener token de acceso de Spotify
+        const getAccessToken = () => {
+            return $.ajax({
+                url: 'https://accounts.spotify.com/api/token',
+                type: 'POST',
+                headers: {
+                    'Authorization': 'Basic ' + btoa(clientId + ':' + clientSecret),
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                data: {
+                    'grant_type': 'client_credentials'
+                }
+            });
+        };
+
+        // Buscar información sobre Luis Miguel en Spotify
+        const searchLuisMiguel = (accessToken) => {
+            return $.ajax({
+                url: 'https://api.spotify.com/v1/search',
+                type: 'GET',
+                headers: {
+                    'Authorization': 'Bearer ' + accessToken
+                },
+                data: {
+                    'q': 'Luis Miguel',
+                    'type': 'artist'
+                }
+            });
+        };        
+
+        // Función principal
+        const main = async () => {
+            try {
+                // Obtener token de acceso
+                const tokenResponse = await getAccessToken();
+                const accessToken = tokenResponse.access_token;
+
+                // Buscar información sobre Luis Miguel
+                const searchResponse = await searchLuisMiguel(accessToken);
+                const artist = searchResponse.artists.items[0];
+
+                // Mostrar información en la página
+                $('#artist-info').html(`
+                    <p>Nombre: ${artist.name}</p>
+                    <p>Popularidad: ${artist.popularity}</p>
+                    <img src="${artist.images[0].url}" alt="Imagen de ${artist.name}">
+                    <p>Géneros: ${artist.genres.join(', ')}</p>
+                    <p>Seguidores: ${artist.followers.total}</p>
+
+
+                `);
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        };        
+
+        // Ejecutar la función principal al cargar la página
+        $(document).ready(() => {
+            main();
+        });
+    </script>
+</body>
+</html>

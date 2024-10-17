@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="/especiales-multimedia/luis-miguel/css/style.css?v90">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
+<!--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">-->
+<title>Luis Miguel</title>
+
+<style>
+    #restart-btn{
+        background-color: #FF29FE;
+        border: none;
+        border-radius: 20px;
+        cursor: pointer;
+        color: #000;
+        display: block;
+        font: 12px/1.5 'druk_widemedium_italic';
+        margin: 30px auto;
+        padding: 10px 20px;
+    }
+    @media (max-width: 640px) {
+      
+        .box-main-trivia{
+            transform: none;
+            top: inherit;
+            width: 99%;
+        }
+        .quiz-finalizado {
+            margin-top: 300px;
+            width: 100%;
+        }
+        
+    }
+</style>
+
+
+</head>
+<body>
+    
+
+    <div class="box-main-trivia">
+        <h3>
+            trivia
+        </h3> 
+        <span>¿Qué tanto comprendes ahora la voz de Luis Miguel?</span>
+        <div class="quiz-container">     
+            <ul id="question-number" class="bullet-list"></ul>    
+            <div class="question">
+                <img src="https://d1ts5g4ys243sh.cloudfront.net/proyectos_especiales_prod/especiales-multimedia/luis-miguel/img/bg-quiz-1.png" alt="pregunta 1" width="100%">
+                <div class="box-pregunta">
+                    
+                    <p id="question-text">
+                        1) ¿Qué elemento no interviene en el proceso de entonación de una nota?
+                    </p>
+                    <div class="choices">
+                        <button class="choice" onclick="checkAnswer(0)">Fonación</button>
+                        <button class="choice" onclick="checkAnswer(1)">Respiración</button>
+                        <button class="choice" onclick="checkAnswer(2)">Resonancia</button>
+                        <button class="choice" onclick="checkAnswer(3)">Timbre</button>
+                    </div>
+                    <p id="feedback"></p>
+                    <button id="next-btn" onclick="nextQuestion()" style="display: none;">Siguiente</button>
+                    <button id="restart-btn" onclick="restartQuiz()" style="display: none;">Volver a intentar</button>
+                </div>                
+            </div>
+        </div>
+    </div>     
+
+
+    <script src="https://d1ts5g4ys243sh.cloudfront.net/proyectos_especiales_prod/especiales/alan-garcia-una-vida-de-portada-ecpm/js/jquery-3.2.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+
+
+    <!-- Quiz-->
+    <script>       
+
+        const questions = [
+            {
+                image: "https://d1ts5g4ys243sh.cloudfront.net/proyectos_especiales_prod/especiales-multimedia/luis-miguel/img/bg-quiz-1.png", 
+                question: "1) ¿Qué elemento no interviene en el proceso de entonación de una nota?",
+                choices: ["Fonación", "Respiración", "Resonancia", "Timbre"],
+                correct: 3
+            },
+            {
+                image: "https://d1ts5g4ys243sh.cloudfront.net/proyectos_especiales_prod/especiales-multimedia/luis-miguel/img/bg-quiz-2.png",
+                question: "2) ¿Cómo se mide el rango vocal?",
+                choices: ["En acordes musicales", "En notas agudas", "En octavas", "A través de la fonética"],
+                correct: 2
+            },
+            {
+                image: "https://d1ts5g4ys243sh.cloudfront.net/proyectos_especiales_prod/especiales-multimedia/luis-miguel/img/bg-quiz-3.png",
+                question: "3) ¿Qué es la versatilidad vocal?",
+                choices: ["Es la capacidad de adaptar la voz a diferentes estilos, géneros y registros musicales", "Es el conjunto de habilidades para cantar de forma correcta, saludable y eficaz", "Es la capacidad de un cantante de transmitir emociones", "Es la cualidad que hace que una voz sea única y reconocible"],
+                correct: 0
+            },
+            {
+                image: "https://d1ts5g4ys243sh.cloudfront.net/proyectos_especiales_prod/especiales-multimedia/luis-miguel/img/bg-quiz-4.png",
+                question: "4) ¿Con qué artistas colaboró a lo largo de su carrera?",
+                choices: ["Frank Sinatra", "Sheena Easton", "Celine Dion", "Todas las anteriores"],
+                correct: 3
+            },
+            {
+                image: "https://d1ts5g4ys243sh.cloudfront.net/proyectos_especiales_prod/especiales-multimedia/luis-miguel/img/bg-quiz-5.png",
+                question: "5) ¿Cuál fue la canción de Luis Miguel que resultó de adaptar “I Only Want to Be with You” de Dusty Springfield?",
+                choices: ["Sol, arena y mar", "Un hombre busca una mujer", "Ahora te puedes marchar", "Será que no me amas"],
+                correct: 2
+            },
+        ];
+
+        let currentQuestion = 0;
+        let correctAnswers = 0;
+        const totalQuestions = questions.length;
+
+        function showQuestion() {
+            const questionText = document.getElementById("question-text");
+            questionText.textContent = questions[currentQuestion].question;
+
+            // Mostrar los bullets para indicar el progreso
+            const questionNumber = document.getElementById("question-number");
+            questionNumber.innerHTML = '';
+            for (let i = 0; i < totalQuestions; i++) {
+                const bullet = document.createElement("li");
+                bullet.textContent = "\u2022"; // Código de bullet
+                if (i === currentQuestion) {
+                    bullet.classList.add("current"); // Marcar la pregunta actual
+                }
+                questionNumber.appendChild(bullet);
+            }
+
+            // Actualizar la imagen
+            const questionImage = document.querySelector(".question img");
+            questionImage.src = questions[currentQuestion].image;
+
+            const choices = document.querySelectorAll(".choice");
+            choices.forEach((choice, index) => {
+                choice.textContent = questions[currentQuestion].choices[index];
+                choice.classList.add("inactive"); // Agregar clase "inactive" a todas las opciones
+                choice.disabled = false; // Habilitar todas las opciones
+            });
+
+            const feedback = document.getElementById("feedback");
+            feedback.textContent = "";
+        }
+
+
+        function checkAnswer(selected) {
+            const feedback = document.getElementById("feedback");
+            if (selected === questions[currentQuestion].correct) {
+                feedback.textContent = "¡Es correcto!";
+                feedback.classList.add("correct-answer"); // Añadir la clase correcta
+                correctAnswers++;
+            } else {
+                feedback.textContent = "Te equivocaste...";
+                feedback.classList.remove("correct-answer"); // Eliminar la clase correcta, si está presente
+                feedback.classList.add("incorrect-answer"); // Añadir la clase incorrecta
+
+                // Agregar clase "inactive" a las opciones que no se seleccionaron
+                const choices = document.querySelectorAll(".choice");
+                choices.forEach((choice, index) => {
+                    if (index !== selected) {
+                        choice.classList.add("inactive");
+                        choice.disabled = true; // Desactivar opciones no seleccionadas
+                    }
+                });
+
+                // Mostrar resolución de la respuesta incorrecta
+                feedback.textContent += " La respuesta correcta es: " + questions[currentQuestion].choices[questions[currentQuestion].correct];
+            }
+
+            const nextBtn = document.getElementById("next-btn");
+            nextBtn.style.display = "block"; // Mostrar el botón "Siguiente"
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            const nextBtn = document.getElementById("next-btn");
+            nextBtn.style.display = "none"; // Ocultar el botón "Siguiente"
+            if (currentQuestion < totalQuestions) {
+                showQuestion();
+            } else {
+                showResultMessage(correctAnswers); // Llamar a la función showResultMessage() al finalizar el cuestionario
+            }
+        }
+
+        function showResultMessage(correctAnswers) {
+            let resultMessage = "";
+            if (correctAnswers === 0) {
+                resultMessage = "¡Ups! Parece que necesitas afinar tus conocimientos musicales. Pero no te preocupes, porque la práctica hace al maestro.";
+            }
+            else if (correctAnswers === 1) {
+                resultMessage = "¡Ups! Parece que necesitas afinar tus conocimientos musicales. Pero no te preocupes, porque la práctica hace al maestro.";
+            } else if (correctAnswers === 2) {
+                resultMessage = "¡Ups! Parece que necesitas afinar tus conocimientos musicales. Pero no te preocupes, porque la práctica hace al maestro. ";
+            } else if (correctAnswers === 3) {
+                resultMessage = "¡Bien hecho! Estás en el rango medio. Tu voz está en proceso de afinación, ¡sigue así!";
+            } else if (correctAnswers === 4) {
+                resultMessage = "¡Bien hecho! Estás en el rango medio. Tu voz está en proceso de afinación, ¡sigue así!";
+            } else if (correctAnswers === 5) {
+                resultMessage = "¡Increíble! Eres un verdadero maestro de la melodía. Tu voz es como un solista en su mejor momento.";
+            } else {
+                resultMessage = "¡Sigue practicando!";
+            }
+
+            const quizContainer = document.querySelector(".quiz-container");
+            quizContainer.innerHTML = `<p class="texto-resultado-suma">Respondiste ${correctAnswers} de ${totalQuestions} preguntas correctamente.</p>`;
+            quizContainer.innerHTML += `<p class="texto-resultado">${resultMessage}</p>`;
+            quizContainer.innerHTML += `<a class="btn-reiniciar" href="https://especiales.elcomercio.pe/?q=especiales-multimedia/luis-miguel/index-trivia.html" target="_self"><button id="restart-btn">Volver a intentar</button></a>`;    
+            
+            // Añadir la clase al elemento "box-main-trivia"
+            const boxMainTrivia = document.querySelector(".box-main-trivia");
+            boxMainTrivia.classList.add("quiz-finalizado");
+        
+        }       
+
+        function restartQuiz() {
+            currentQuestion = 0;
+            correctAnswers = 0;
+            showQuestion();
+        }
+
+        showQuestion();
+
+
+    </script>
+
+    
+
+
+</body>
+</html>
